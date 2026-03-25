@@ -6,8 +6,6 @@
     <title>Georgia Mountain Trek - Objev Gruzii</title>
     <!-- Leaflet Map Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-    <!-- Chart.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -239,7 +237,7 @@
         /* MAP SECTION */
         #trekMap {
             width: 100%;
-            height: 500px;
+            height: 600px;
             border-radius: 10px;
             margin: 30px 0;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -278,25 +276,6 @@
             color: #2c3e50;
             font-size: 24px;
             font-weight: bold;
-        }
-
-        /* ELEVATION CHART */
-        .chart-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin: 30px 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-container h3 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        #elevationChart {
-            max-height: 400px;
         }
 
         /* DATES */
@@ -456,6 +435,17 @@
             margin: 10px 0;
         }
 
+        /* POPUP INFO */
+        .leaflet-popup-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+        }
+
+        .leaflet-popup-content strong {
+            color: #ff9500;
+            font-size: 16px;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
             nav {
@@ -500,7 +490,7 @@
             }
 
             #trekMap {
-                height: 350px;
+                height: 400px;
             }
         }
     </style>
@@ -533,7 +523,6 @@
 </section>
 
 <script>
-    // Dynamicky nastav banner.jpg jako pozadí hero sekce
     document.querySelector('.hero').style.backgroundImage = 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(banner.jpg)';
 </script>
 
@@ -541,7 +530,6 @@
 <section class="light-section" id="routes">
     <h2>🥾 Naše Trasy</h2>
     <div class="routes-grid">
-        <!-- Route 1 -->
         <div class="route-card">
             <img src="1.jpg" alt="Svaneti Trek" class="route-image">
             <div class="route-content">
@@ -556,7 +544,6 @@
             </div>
         </div>
 
-        <!-- Route 2 -->
         <div class="route-card">
             <img src="2.jpg" alt="Caucasus Expedition" class="route-image">
             <div class="route-content">
@@ -571,7 +558,6 @@
             </div>
         </div>
 
-        <!-- Route 3 -->
         <div class="route-card">
             <img src="3.jpg" alt="Cultural Trek" class="route-image">
             <div class="route-content">
@@ -590,7 +576,8 @@
 
 <!-- TREK MAP SECTION -->
 <section class="light-section" id="trek-map">
-    <h2>🗺️ Mapa Trasy</h2>
+    <h2>🗺️ Interaktivní Mapa Trasy</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 20px;">Klikni na libovolný bod na trase a uvidíš nadmořskou výšku 📍</p>
     
     <div id="trekMap"></div>
 
@@ -614,12 +601,6 @@
                 <p>Středně těžké</p>
             </div>
         </div>
-    </div>
-
-    <!-- ELEVATION CHART -->
-    <div class="chart-container">
-        <h3>📈 Profil Nadmořské Výšky</h3>
-        <canvas id="elevationChart"></canvas>
     </div>
 </section>
 
@@ -756,17 +737,15 @@
     // ==========================================
     // TREK DATA - Svaneti Trek
     // ==========================================
-    const trekData = {
-        days: [
-            { day: 1, name: "Mestia", elevation: 1900, lat: 43.0042, lng: 42.7337, distance: 0 },
-            { day: 2, name: "Guli Pass", elevation: 2611, lat: 43.0156, lng: 42.6578, distance: 12 },
-            { day: 3, name: "Shdugra Waterfall", elevation: 2100, lat: 43.0512, lng: 42.5823, distance: 25 },
-            { day: 4, name: "Ushba Base Camp", elevation: 2500, lat: 43.1189, lng: 42.5045, distance: 35 },
-            { day: 5, name: "Gvandra Pass", elevation: 2952, lat: 43.1725, lng: 42.3567, distance: 45 },
-            { day: 6, name: "Baki Plateau", elevation: 2600, lat: 43.1823, lng: 42.2345, distance: 55 },
-            { day: 7, name: "Mestia Return", elevation: 1900, lat: 43.0042, lng: 42.7337, distance: 65 }
-        ]
-    };
+    const trekData = [
+        { day: 1, name: "Mestia", elevation: 1900, lat: 43.0042, lng: 42.7337 },
+        { day: 2, name: "Guli Pass", elevation: 2611, lat: 43.0156, lng: 42.6578 },
+        { day: 3, name: "Shdugra Waterfall", elevation: 2100, lat: 43.0512, lng: 42.5823 },
+        { day: 4, name: "Ushba Base Camp", elevation: 2500, lat: 43.1189, lng: 42.5045 },
+        { day: 5, name: "Gvandra Pass", elevation: 2952, lat: 43.1725, lng: 42.3567 },
+        { day: 6, name: "Baki Plateau", elevation: 2600, lat: 43.1823, lng: 42.2345 },
+        { day: 7, name: "Mestia Return", elevation: 1900, lat: 43.0042, lng: 42.7337 }
+    ];
 
     // ==========================================
     // MAP INITIALIZATION
@@ -779,79 +758,42 @@
     }).addTo(map);
 
     // Draw trek route
-    const routeCoordinates = trekData.days.map(day => [day.lat, day.lng]);
-    const polyline = L.polyline(routeCoordinates, { color: '#ff9500', weight: 3, opacity: 0.8 }).addTo(map);
+    const routeCoordinates = trekData.map(day => [day.lat, day.lng]);
+    const polyline = L.polyline(routeCoordinates, { 
+        color: '#ff9500', 
+        weight: 4, 
+        opacity: 0.8 
+    }).addTo(map);
 
-    // Add markers for each day
-    trekData.days.forEach((day, index) => {
+    // Add interactive markers for each day
+    trekData.forEach((day) => {
         const icon = L.divIcon({
             className: 'day-marker',
-            html: `<div style="background: #ff9500; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">${day.day}</div>`,
-            iconSize: [35, 35],
-            popupAnchor: [0, -17]
+            html: `<div style="background: #ff9500; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4);">${day.day}</div>`,
+            iconSize: [40, 40],
+            popupAnchor: [0, -20]
         });
 
-        L.marker([day.lat, day.lng], { icon: icon })
-            .bindPopup(`<strong>Den ${day.day}: ${day.name}</strong><br>Výška: ${day.elevation}m<br>Délka: ${day.distance}km`)
-            .addTo(map);
+        const marker = L.marker([day.lat, day.lng], { icon: icon }).addTo(map);
+
+        // Popup s nadmořskou výškou
+        marker.bindPopup(`
+            <div style="text-align: center;">
+                <strong style="font-size: 16px; color: #ff9500;">Den ${day.day}: ${day.name}</strong><br>
+                <span style="font-size: 14px; color: #333;">
+                    <strong>Nadmořská výška:</strong> ${day.elevation} m
+                </span>
+            </div>
+        `, { maxWidth: 250 });
+
+        // Kliknutí na marker otevře popup
+        marker.on('click', function() {
+            marker.openPopup();
+        });
     });
 
     // Fit map to route bounds
     map.fitBounds(polyline.getBounds());
-
-    // ==========================================
-    // ELEVATION CHART
-    // ==========================================
-    const elevationCtx = document.getElementById('elevationChart').getContext('2d');
-    const elevationChart = new Chart(elevationCtx, {
-        type: 'line',
-        data: {
-            labels: trekData.days.map(day => `Den ${day.day}`),
-            datasets: [{
-                label: 'Nadmořská výška (m)',
-                data: trekData.days.map(day => day.elevation),
-                borderColor: '#ff9500',
-                backgroundColor: 'rgba(255, 149, 0, 0.1)',
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#ff9500',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: { font: { size: 14 } }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Nadmořská výška (metrů)'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return value + ' m';
-                        }
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Den treku'
-                    }
-                }
-            }
-        }
-    });
 
     // ==========================================
     // FORM SUBMISSION
