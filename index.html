@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Georgia Mountain Trek - Objev Gruzii</title>
+    <!-- Leaflet Map Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -69,8 +73,9 @@
         /* HERO SECTION */
         .hero {
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop') center/cover;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+            background-size: cover;
+            background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -229,6 +234,69 @@
             color: #666;
             line-height: 1.6;
             margin-bottom: 15px;
+        }
+
+        /* MAP SECTION */
+        #trekMap {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* ELEVATION CHART */
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #elevationChart {
+            max-height: 400px;
         }
 
         /* DATES */
@@ -430,6 +498,10 @@
             .booking-form {
                 padding: 20px;
             }
+
+            #trekMap {
+                height: 350px;
+            }
         }
     </style>
 </head>
@@ -441,6 +513,7 @@
     <ul>
         <li><a href="#home">Úvod</a></li>
         <li><a href="#routes">Trasy</a></li>
+        <li><a href="#trek-map">Mapa</a></li>
         <li><a href="#dates">Termíny</a></li>
         <li><a href="#gallery">Galerie</a></li>
         <li><a href="#booking">Rezervace</a></li>
@@ -459,13 +532,18 @@
     </div>
 </section>
 
+<script>
+    // Dynamicky nastav banner.jpg jako pozadí hero sekce
+    document.querySelector('.hero').style.backgroundImage = 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(banner.jpg)';
+</script>
+
 <!-- ROUTES SECTION -->
 <section class="light-section" id="routes">
     <h2>🥾 Naše Trasy</h2>
     <div class="routes-grid">
         <!-- Route 1 -->
         <div class="route-card">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop" alt="Svaneti Trek" class="route-image">
+            <img src="1.jpg" alt="Svaneti Trek" class="route-image">
             <div class="route-content">
                 <h3>Svaneti Trek - 7 dní</h3>
                 <div class="route-info">
@@ -480,7 +558,7 @@
 
         <!-- Route 2 -->
         <div class="route-card">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop" alt="Caucasus Expedition" class="route-image">
+            <img src="2.jpg" alt="Caucasus Expedition" class="route-image">
             <div class="route-content">
                 <h3>Caucasus Expedition - 10 dní</h3>
                 <div class="route-info">
@@ -495,7 +573,7 @@
 
         <!-- Route 3 -->
         <div class="route-card">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop" alt="Cultural Trek" class="route-image">
+            <img src="3.jpg" alt="Cultural Trek" class="route-image">
             <div class="route-content">
                 <h3>Cultural Trek - 5 dní</h3>
                 <div class="route-info">
@@ -507,6 +585,41 @@
                 <a href="#booking" class="btn-primary" style="display: block; text-align: center;">Vybrat</a>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- TREK MAP SECTION -->
+<section class="light-section" id="trek-map">
+    <h2>🗺️ Mapa Trasy</h2>
+    
+    <div id="trekMap"></div>
+
+    <div class="map-info">
+        <h3>Svaneti Trek Route - 7 dní</h3>
+        <div class="map-stats">
+            <div class="stat-card">
+                <h4>Vzdálenost</h4>
+                <p>65 km</p>
+            </div>
+            <div class="stat-card">
+                <h4>Převýšení</h4>
+                <p>3500 m</p>
+            </div>
+            <div class="stat-card">
+                <h4>Max. výška</h4>
+                <p>2952 m</p>
+            </div>
+            <div class="stat-card">
+                <h4>Typ</h4>
+                <p>Středně těžké</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ELEVATION CHART -->
+    <div class="chart-container">
+        <h3>📈 Profil Nadmořské Výšky</h3>
+        <canvas id="elevationChart"></canvas>
     </div>
 </section>
 
@@ -565,22 +678,16 @@
     <h2>📸 Galerie</h2>
     <div class="gallery-grid">
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt="Hory Gruzie">
+            <img src="1.jpg" alt="Hory Gruzie">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=300&h=300&fit=crop" alt="Věže Svaneti">
+            <img src="2.jpg" alt="Věže Svaneti">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt="Horské jezero">
+            <img src="3.jpg" alt="Horské jezero">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=300&h=300&fit=crop" alt="Tradiční vesnice">
-        </div>
-        <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt="Západ slunce">
-        </div>
-        <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=300&h=300&fit=crop" alt="Zvěř">
+            <img src="banner.jpg" alt="Tradiční vesnice">
         </div>
     </div>
 </section>
@@ -642,7 +749,113 @@
     </p>
 </footer>
 
+<!-- Leaflet Map Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
 <script>
+    // ==========================================
+    // TREK DATA - Svaneti Trek
+    // ==========================================
+    const trekData = {
+        days: [
+            { day: 1, name: "Mestia", elevation: 1900, lat: 43.0042, lng: 42.7337, distance: 0 },
+            { day: 2, name: "Guli Pass", elevation: 2611, lat: 43.0156, lng: 42.6578, distance: 12 },
+            { day: 3, name: "Shdugra Waterfall", elevation: 2100, lat: 43.0512, lng: 42.5823, distance: 25 },
+            { day: 4, name: "Ushba Base Camp", elevation: 2500, lat: 43.1189, lng: 42.5045, distance: 35 },
+            { day: 5, name: "Gvandra Pass", elevation: 2952, lat: 43.1725, lng: 42.3567, distance: 45 },
+            { day: 6, name: "Baki Plateau", elevation: 2600, lat: 43.1823, lng: 42.2345, distance: 55 },
+            { day: 7, name: "Mestia Return", elevation: 1900, lat: 43.0042, lng: 42.7337, distance: 65 }
+        ]
+    };
+
+    // ==========================================
+    // MAP INITIALIZATION
+    // ==========================================
+    const map = L.map('trekMap').setView([43.0, 42.6], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Draw trek route
+    const routeCoordinates = trekData.days.map(day => [day.lat, day.lng]);
+    const polyline = L.polyline(routeCoordinates, { color: '#ff9500', weight: 3, opacity: 0.8 }).addTo(map);
+
+    // Add markers for each day
+    trekData.days.forEach((day, index) => {
+        const icon = L.divIcon({
+            className: 'day-marker',
+            html: `<div style="background: #ff9500; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">${day.day}</div>`,
+            iconSize: [35, 35],
+            popupAnchor: [0, -17]
+        });
+
+        L.marker([day.lat, day.lng], { icon: icon })
+            .bindPopup(`<strong>Den ${day.day}: ${day.name}</strong><br>Výška: ${day.elevation}m<br>Délka: ${day.distance}km`)
+            .addTo(map);
+    });
+
+    // Fit map to route bounds
+    map.fitBounds(polyline.getBounds());
+
+    // ==========================================
+    // ELEVATION CHART
+    // ==========================================
+    const elevationCtx = document.getElementById('elevationChart').getContext('2d');
+    const elevationChart = new Chart(elevationCtx, {
+        type: 'line',
+        data: {
+            labels: trekData.days.map(day => `Den ${day.day}`),
+            datasets: [{
+                label: 'Nadmořská výška (m)',
+                data: trekData.days.map(day => day.elevation),
+                borderColor: '#ff9500',
+                backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#ff9500',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { font: { size: 14 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Nadmořská výška (metrů)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' m';
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Den treku'
+                    }
+                }
+            }
+        }
+    });
+
+    // ==========================================
+    // FORM SUBMISSION
+    // ==========================================
     function handleSubmit(event) {
         event.preventDefault();
         
@@ -656,7 +869,9 @@
         event.target.reset();
     }
 
-    // Smooth scroll
+    // ==========================================
+    // SMOOTH SCROLL
+    // ==========================================
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
